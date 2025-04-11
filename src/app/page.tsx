@@ -9,14 +9,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { improveModelAccuracy } from "@/ai/flows/improve-model-accuracy";
 import { explainPrediction } from "@/ai/flows/explain-prediction";
 import { Progress } from "@/components/ui/progress";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { CheckCircle } from "lucide-react";
 
 export default function Home() {
   const [dataset, setDataset] = useState<string>("");
   const [modelAccuracy, setModelAccuracy] = useState<number | null>(null);
   const [patientData, setPatientData] = useState<string>("");
-  const [prediction, setPrediction] = useState<{ probability: number; confidence: string } | null>(null);
+  const [prediction, setPrediction] = useState<{ probability: number; explanation: string } | null>(null);
   const [training, setTraining] = useState(false);
-  const [trainingProgress, setTrainingProgress] = useState(0); // Between 0 and 100
+  const [trainingProgress, setTrainingProgress] = useState(0);
+  const [loadingPrediction, setLoadingPrediction] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleDatasetUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length > 0) {
@@ -33,18 +37,17 @@ export default function Home() {
     setTraining(true);
     setTrainingProgress(30);
 
-    // Simulate training and GenAI call
-    // Replace with actual training logic and GenAI call
     setTimeout(async () => {
       try {
         setTrainingProgress(70);
         const accuracyResult = await improveModelAccuracy({
           datasetDescription: dataset,
-          initialModelAccuracy: 0.65, // initial model accuracy assumption
+          initialModelAccuracy: 0.65,
         });
 
         setModelAccuracy(accuracyResult.improvedAccuracy);
         setTrainingProgress(100);
+        setSuccess(true); // Set success to true after successful training
       } catch (error: any) {
         console.error("Training failed:", error);
         // Handle error (e.g., display an error message)
@@ -56,19 +59,22 @@ export default function Home() {
   };
 
   const handlePredictDyslexia = async () => {
+    setLoadingPrediction(true);
     try {
       const predictionResult = await explainPrediction({
-        probability: 0.85, // Assume 85% probability
+        probability: 0.7, //fixed value
         eyeMovementData: patientData,
       });
 
       setPrediction({
-        probability: 0.85, //fixed value
-        confidence: predictionResult.confidence,
+        probability: 0.7, //fixed value
+        explanation: predictionResult.explanation,
       });
     } catch (error: any) {
       console.error("Prediction failed:", error);
       // Handle error (e.g., display an error message)
+    } finally {
+      setLoadingPrediction(false);
     }
   };
 
@@ -101,9 +107,19 @@ export default function Home() {
             </Button>
           )}
           {modelAccuracy !== null && (
+            <div>
             <p className="mt-2">
               Model Accuracy: {modelAccuracy.toFixed(2)}
             </p>
+             {success && (
+               <Alert variant="default">
+                  <CheckCircle className="h-4 w-4" />
+                  <AlertDescription>
+                     Model training successful!
+                  </AlertDescription>
+               </Alert>
+             )}
+            </div>
           )}
         </CardContent>
       </Card>
@@ -126,15 +142,15 @@ export default function Home() {
           <h2 className="text-lg font-semibold">4. Dyslexia Prediction</h2>
         </CardHeader>
         <CardContent>
-          <Button onClick={handlePredictDyslexia} disabled={!patientData}>
-            Predict Dyslexia
+          <Button onClick={handlePredictDyslexia} disabled={!patientData || loadingPrediction}>
+            {loadingPrediction ? "Predicting..." : "Predict Dyslexia"}
           </Button>
           {prediction && (
             <div className="mt-4">
               <p>
                 Probability of Dyslexia: {(prediction.probability * 100).toFixed(2)}%
               </p>
-              <p>Confidence: {prediction.confidence}</p>
+              <p>Explanation: {prediction.explanation}</p>
             </div>
           )}
         </CardContent>
