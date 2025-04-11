@@ -10,7 +10,6 @@ import { explainPrediction } from "@/ai/flows/explain-prediction";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle } from "lucide-react";
-import EyeTrackingAnalysis from "@/components/EyeTrackingAnalysis";
 import { trainModelAndPredict } from "@/lib/dyslexia-model";
 
 export default function Home() {
@@ -125,8 +124,6 @@ export default function Home() {
           )}
         </CardContent>
       </Card>
-
-      <EyeTrackingAnalysis />
     </div>
   );
 }
