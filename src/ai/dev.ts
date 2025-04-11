@@ -1,1 +1,2 @@
-// Flows will be imported for their side effects in this file.
+import '@/ai/flows/improve-model-accuracy.ts';
+import '@/ai/flows/explain-prediction.ts';
