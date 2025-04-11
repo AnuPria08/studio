@@ -10,6 +10,7 @@ import { explainPrediction } from "@/ai/flows/explain-prediction";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { CheckCircle } from "lucide-react";
+import EyeTrackingAnalysis from "@/components/EyeTrackingAnalysis";
 
 export default function Home() {
   const [dataset, setDataset] = useState<string>("");
@@ -122,6 +123,8 @@ export default function Home() {
           )}
         </CardContent>
       </Card>
+
+        <EyeTrackingAnalysis/>
 
       <Card className="mb-4">
         <CardHeader>
