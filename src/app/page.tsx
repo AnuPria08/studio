@@ -47,13 +47,12 @@ export default function Home() {
   const handleTrainAndPredict = async () => {
     setTraining(true);
     setTrainingProgress(30);
+    setTrainingProgress(90);
 
     try {
-      setTrainingProgress(70);
       const result = await trainModelAndPredict(trainingDataset, predictionDataset);
       setModelAccuracy(result.accuracy);
       setPredictionResult(result.prediction);
-      setTrainingProgress(100);
       setSuccess(true);
     } catch (error: any) {
       console.error("Training and prediction failed:", error);
@@ -61,7 +60,7 @@ export default function Home() {
     } finally {
       setTraining(false);
       setPredicting(false);
-      setTrainingProgress(0);
+      setTrainingProgress(100);
     }
   };
 
