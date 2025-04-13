@@ -39,7 +39,7 @@ export async function trainModelAndPredict(trainingData: string, predictionData:
       pythonProcess.on('close', (code) => {
         if (code !== 0) {
           console.error(`Python script execution failed with code ${code}, error: ${error}`);
-          reject(new Error(`Python script execution failed with code ${code}, error: ${error}. Check server logs for details.`));
+          reject(new Error(`Python script execution failed with code ${code}, error: ${error}.  Check server logs for details.`));
           return;
         }
 
@@ -53,8 +53,10 @@ export async function trainModelAndPredict(trainingData: string, predictionData:
           reject(new Error(`Failed to parse JSON result: ${parseError}. Raw output: ${result}`));
         }
       });
-    } catch (e:any) {
+    } catch (e: any) {
+      console.error('Failed to spawn or execute Python script:', e);
       reject(new Error(`Failed to spawn or execute Python script: ${e.message}`));
     }
   });
 }
+
