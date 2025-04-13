@@ -37,19 +37,17 @@ export async function trainModelAndPredict(trainingData: string, predictionData:
     // Handle the completion of the Python process.
     pythonProcess.on('close', (code) => {
       if (code !== 0) {
-        // If the exit code is not 0, it indicates an error in the Python script.
         console.error(`Python script execution failed with code ${code}, error: ${error}`);
         reject(new Error(`Python script execution failed with code ${code}, error: ${error}. Check server logs for details.`));
         return;
       }
 
       try {
-        // Attempt to parse the JSON result from the Python script's output.
+        console.log("Raw result from Python script:", result); // Log the raw result
         const parsedResult = JSON.parse(result);
-        console.log("Parsed Result:", parsedResult); // Log the parsed result for debugging
+        console.log("Parsed Result:", parsedResult); // Log the parsed result
         resolve(parsedResult);
       } catch (parseError) {
-        // If parsing fails, it indicates that the Python script's output is not in the expected JSON format.
         console.error('Failed to parse JSON result:', parseError, 'Raw result:', result);
         reject(new Error(`Failed to parse JSON result: ${parseError}. Raw output: ${result}`));
       }

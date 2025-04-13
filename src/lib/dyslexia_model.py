@@ -8,23 +8,31 @@ import sys
 import json
 
 def clean_data(df):
-    for col in df.columns:
-        if df[col].dtype == object:
-            if col == 'N':  # Assuming 'N' column represents names
-                df[col] = df[col].astype('category').cat.codes
-            else:
-                df[col] = pd.to_numeric(df[col], errors='ignore')
-                if df[col].dtype == object:  # Convert to category only if still object
+    try:
+        for col in df.columns:
+            if df[col].dtype == object:
+                if col == 'N':  # Assuming 'N' column represents names
                     df[col] = df[col].astype('category').cat.codes
-    return df
+                else:
+                    df[col] = pd.to_numeric(df[col], errors='ignore')
+                    if df[col].dtype == object:  # Convert to category only if still object
+                        df[col] = df[col].astype('category').cat.codes
+        return df
+    except Exception as e:
+        print(f"Error during data cleaning: {e}")
+        return None
 
 def train_and_predict(training_data, prediction_data):
     try:
+        print(f"Training data path: {training_data}, Prediction data path: {prediction_data}")
         training_df = pd.read_csv(training_data)
         prediction_df = pd.read_csv(prediction_data)  # No need to copy
 
         training_df = clean_data(training_df)
         prediction_df = clean_data(prediction_df)
+
+        if training_df is None or prediction_df is None:
+            raise ValueError("Data cleaning failed. Check data types and contents.")
 
         X = training_df.drop('dyslexia', axis=1, errors='ignore')
         y = training_df['dyslexia'] if 'dyslexia' in training_df.columns else pd.Series(np.zeros(len(training_df)))
@@ -43,6 +51,7 @@ def train_and_predict(training_data, prediction_data):
         return accuracy, prediction
 
     except Exception as e:
+        print(f"Error during training and prediction: {e}")
         return None, str(e)
 
 if __name__ == "__main__":
